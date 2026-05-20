@@ -1,5 +1,9 @@
 # LogsReaper
 
+<p align="center">
+  <img src="assets/header.jpg" alt="Horse-drawn reaper binder, Walter A. Wood, 19th-century illustration" width="100%">
+</p>
+
 LogsReaper is a standalone tool for massive service logs. It parses JSON, NDJSON, and text logs, groups traceback records, mines stable normalized templates, classifies expected and unexpected errors, and emits an intermediate representation optimized for debugging, CI, analytics, and ML.
 
 The tool is self-contained and does not require any changes in the services that produce the logs.
