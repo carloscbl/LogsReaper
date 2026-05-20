@@ -243,3 +243,7 @@ Rules are YAML and default to `configs/default-rules.yaml`.
 ## Dataset Export
 
 `export-dataset` writes event-level NDJSON without raw log records by default. It includes normalized templates and classification labels. Use `--include-body` only for controlled debugging because bodies can contain PII.
+
+## License
+
+[MIT](./LICENSE) © 2026 Carlos Bernal.

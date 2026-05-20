@@ -7,6 +7,8 @@ name = "logs-reaper"
 version = "0.1.0"
 description = "Standalone log parser, template miner, classifier, and run comparator."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
   "pyarrow>=15",
