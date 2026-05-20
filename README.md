@@ -1,8 +1,22 @@
 # LogsReaper
 
-LogsReaper is a standalone MVP for massive service logs. It parses JSON, NDJSON, and text logs, groups traceback records, mines stable normalized templates, classifies expected and unexpected errors, and emits an intermediate representation optimized for debugging, CI, analytics, and ML.
+LogsReaper is a standalone tool for massive service logs. It parses JSON, NDJSON, and text logs, groups traceback records, mines stable normalized templates, classifies expected and unexpected errors, and emits an intermediate representation optimized for debugging, CI, analytics, and ML.
 
 The tool is self-contained and does not require any changes in the services that produce the logs.
+
+## Performance
+
+LogsReaper does substantially more than a pure template miner on its hot path — it parses NDJSON, normalizes via a regex pipeline, runs a custom Rust Drain over already-normalized templates, aggregates counters, and writes structured Arrow outputs. Even so, it is significantly faster than the reference `drain3` Python implementation on the same input.
+
+Synthetic 128 MiB NDJSON, 686,320 events, 1 warmup + 3 measured trials (`benchmarks/compare_logsreaper_vs_drain3.py`):
+
+| Engine     | Throughput (MB/s) | Events/s    | Mean RSS (MB) | Notes                                       |
+|------------|------------------:|------------:|--------------:|---------------------------------------------|
+| LogsReaper |            260.06 |   1,394,421 |          1340 | NDJSON parse + normalize + Drain + Arrow out |
+| drain3     |             39.09 |     209,619 |            20 | Template mining over `message` after `json.loads` |
+| **Ratio**  |        **6.65×**  |    **6.65×**|             — | LogsReaper / drain3                          |
+
+Caveat: this is a hot-path comparison, not full feature parity. `drain3` is only mining templates from the `message` field; LogsReaper covers the whole pipeline end-to-end. The full reports live in `benchmarks/results/`.
 
 ## Engine Architecture
 
@@ -68,6 +82,64 @@ Donde mirar:
 - `out/<service>/<run_id>/summary.json`
 - `out/<service>/<run_id>/report.md`
 - `out/<service>/service-scan-registry.json`
+
+## Running with Docker (sidecar pattern)
+
+The primary deployment shape of LogsReaper is as a **sidecar** that runs next to your application containers and ingests their logs through the host's docker socket. No code changes are required in the apps you want to observe.
+
+### Building the image
+
+```bash
+docker build -t logs-reaper:dev .
+```
+
+This produces a multi-stage image (~280 MB) that bundles the Python CLI, the Rust pyo3 hot-path wheel and the docker CLI client.
+
+### Standalone one-shot
+
+```bash
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v "$(pwd)/out:/work/out" \
+  -v "$(pwd)/baselines:/work/baselines" \
+  logs-reaper:dev collect --services app,worker --duration 60
+```
+
+What it needs:
+
+- **`/var/run/docker.sock`** mounted read-only — so the container can call `docker logs -f` on its siblings.
+- **`/work/out`** — persistent scan outputs (`run.json`, `events.parquet`, `report.md`, ...).
+- **`/work/baselines`** — persistent per-service template baselines used by the diff engine.
+
+### docker-compose (recommended)
+
+The repo ships a ready-to-use [`docker-compose.yml`](./docker-compose.yml) that wires LogsReaper alongside two example services (`app` and `worker`). LogsReaper auto-discovers any sibling whose container name matches `<COMPOSE_PROJECT_NAME>-*-1`:
+
+```bash
+COMPOSE_PROJECT_NAME=myapp docker compose up -d
+docker compose logs -f logs-reaper          # watch ingestion
+docker compose run --rm logs-reaper scan --service app   # ad-hoc scan
+```
+
+Drop the `command:` block (or change it to `dashboard`) to expose the Streamlit dashboard on port 8501 instead of (or alongside) the collector.
+
+### Useful subcommands when running inside the container
+
+```bash
+# Continuous ingest (foreground); writes one capture file per service:
+logs-reaper collect --services all --prefix myapp --duration 600
+
+# Single scan over an already-captured file:
+logs-reaper scan --service app --input /work/out/app/captures/latest.log
+
+# Streamlit dashboard (browse runs, deltas, Jira hand-off):
+logs-reaper dashboard --registry-root /work/out --host 0.0.0.0 --port 8501
+
+# End-to-end CI pipeline (collect + scan + index + diff + report):
+logs-reaper ci-run --services all --duration 300 --out /work/out
+```
+
+The `--prefix` flag scopes auto-discovery to a single docker-compose project (it matches `<prefix>-<service>-1`). Leave it empty to match every running container ending in `-1`.
 
 ## Service Instances (restart awareness)
 

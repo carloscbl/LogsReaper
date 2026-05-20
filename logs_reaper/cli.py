@@ -186,8 +186,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Stop after N seconds. If omitted, run until SIGINT/SIGTERM.",
     )
-    collect_parser.add_argument("--prefix", default="sm", help="Container name prefix (default 'sm').")
-    collect_parser.add_argument("--suffix", default="-1", help="Container name suffix (default '-1').")
+    collect_parser.add_argument(
+        "--prefix",
+        default="",
+        help="Container name prefix (default '' = match any). Use to scope to a docker-compose project name.",
+    )
+    collect_parser.add_argument(
+        "--suffix",
+        default="-1",
+        help="Container name suffix (default '-1', the replica index docker-compose appends).",
+    )
     collect_parser.add_argument("--tail", type=int, default=0, help="docker logs --tail (default 0 = future only).")
     collect_parser.add_argument(
         "--stats-port",

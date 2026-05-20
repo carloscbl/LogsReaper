@@ -13,7 +13,9 @@ sm-<svc>-1` y vuelca la salida a `runs/<id>/<svc>.log`. Termina por:
 * todos los servicios desaparecidos
 
 El comportamiento de "auto-detect" mira `docker ps --format {{.Names}}` y
-toma todo lo que matchee `<prefix>-*-1` (default prefix `sm`).
+toma todo lo que matchee `<prefix>-*<suffix>` (defaults: prefix vacío, suffix `-1` —
+el sufijo `-1` es el que añade `docker compose` a la primera réplica de cada
+servicio). Para acotar a un proyecto compose concreto, pasa `--prefix <project>`.
 """
 from __future__ import annotations
 
@@ -36,7 +38,7 @@ class CollectConfig:
     services: list[str]
     out_dir: Path
     duration_seconds: float | None = None
-    container_prefix: str = "sm"
+    container_prefix: str = ""
     container_suffix: str = "-1"
     tail_initial: int = 0  # docker logs --tail
     metadata: dict[str, str] = field(default_factory=dict)
@@ -74,11 +76,13 @@ class CollectStats:
 _SELF_SERVICE_NAME = "logs-reaper"
 
 
-def auto_detect_services(prefix: str = "sm", suffix: str = "-1") -> list[str]:
+def auto_detect_services(prefix: str = "", suffix: str = "-1") -> list[str]:
     """Llama `docker ps` y devuelve los nombres lógicos <svc> que matcheen.
 
     Excluye al propio container (`logs-reaper`) — no tiene sentido que se
-    monitorice a sí mismo cuando corre dentro del proyecto compose sm.
+    monitorice a sí mismo cuando corre dentro del mismo proyecto compose.
+    Un `prefix` vacío equivale a "todos los contenedores" (sólo filtra por
+    `suffix`); útil cuando logs-reaper vive en el mismo compose que la app.
     """
     try:
         proc = subprocess.run(
@@ -88,13 +92,15 @@ def auto_detect_services(prefix: str = "sm", suffix: str = "-1") -> list[str]:
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
         return []
     names: list[str] = []
+    prefix_match = f"{prefix}-" if prefix else ""
+    prefix_strip = len(prefix) + 1 if prefix else 0
     for line in proc.stdout.splitlines():
         line = line.strip()
-        if not line.startswith(f"{prefix}-"):
+        if prefix_match and not line.startswith(prefix_match):
             continue
         if not line.endswith(suffix):
             continue
-        svc = line[len(prefix) + 1 : -len(suffix)] if suffix else line[len(prefix) + 1 :]
+        svc = line[prefix_strip : -len(suffix)] if suffix else line[prefix_strip:]
         if svc and svc != _SELF_SERVICE_NAME:
             names.append(svc)
     return sorted(set(names))

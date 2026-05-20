@@ -1,0 +1,58 @@
+# Example sidecar deployment of LogsReaper.
+#
+# LogsReaper's primary use case is to live next to your application containers
+# and observe their logs via the host's docker socket. The image needs:
+#   * /var/run/docker.sock mounted read-only (to call `docker logs -f`).
+#   * Persistent volumes for outputs (`/work/out`) and baselines (`/work/baselines`).
+#
+# Bring the stack up with:
+#   COMPOSE_PROJECT_NAME=myapp docker compose up -d
+#
+# LogsReaper will auto-discover any sibling container whose name matches
+# `<COMPOSE_PROJECT_NAME>-*-1` (the standard docker-compose replica naming).
+#
+# Replace the `app` / `worker` services below with your real ones.
+
+services:
+  app:
+    image: nginx:1.27-alpine
+    # Any application container; LogsReaper does not require code changes.
+
+  worker:
+    image: redis:7-alpine
+    # A second container, just to show multi-service collection.
+
+  logs-reaper:
+    build: .
+    # Or use a pre-built image:
+    # image: ghcr.io/<you>/logs-reaper:latest
+    depends_on:
+      - app
+      - worker
+    volumes:
+      # Read-only docker socket so logs-reaper can call `docker logs -f`.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Scan outputs (run.json, events.parquet, report.md, ...).
+      - ./out:/work/out
+      # Per-service baselines (template registry + classification deltas).
+      - ./baselines:/work/baselines
+    environment:
+      LOGS_REAPER_OUT: /work/out
+      LOGS_REAPER_BASELINES: /work/baselines
+      # Optional Jira dashboard integration (no-op if unset):
+      # LOGS_REAPER_JIRA_BASE: https://your-org.atlassian.net
+      # LOGS_REAPER_JIRA_PROJECT_KEY: ABC
+      # LOGS_REAPER_JIRA_PARENT_KEY: ABC-1234
+    command:
+      - collect
+      - --services
+      - all
+      - --prefix
+      - ${COMPOSE_PROJECT_NAME:-myapp}
+      - --duration
+      - "600"
+
+# To run the Streamlit dashboard instead of (or alongside) the collector,
+# duplicate the logs-reaper service with:
+#   command: ["dashboard", "--registry-root", "/work/out", "--host", "0.0.0.0", "--port", "8501"]
+#   ports: ["8501:8501"]
