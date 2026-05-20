@@ -1,0 +1,23 @@
+# Scan / CI outputs — these are derived artifacts. Regenerate by running
+# `logs-reaper scan` / `logs-reaper ci-run`; never commit them.
+out/
+out_ci/
+runs/
+
+# Intermediate Arrow IPC produced by the Rust streaming scan. Deleted at the
+# end of every successful scan, but stragglers from crashed runs can linger.
+_rust/
+
+# Per-service baseline artifacts that the indexer rebuilds from registry data.
+# Keep CHANGELOG.md, README.md and baseline_overrides.json under VCS; ignore
+# the parquet snapshots.
+baselines/*/baseline.parquet
+baselines/*/template_registry.parquet
+
+# Rust build outputs and Python caches.
+rust/logs_reaper_core/target/
+rust/logs_reaper_core/target/wheels/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

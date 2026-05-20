@@ -1,0 +1,26 @@
+version: 1
+
+known_noise:
+  - id: client_disconnect_broken_pipe
+    severity: [WARNING, ERROR]
+    template_regex: "(BrokenPipeError|connection reset|client disconnected|ConnectionResetError)"
+    reason: "Accepted client disconnect noise."
+  - id: health_probe_timeout
+    severity: [WARNING, ERROR]
+    template_regex: "(health.?check|readiness|liveness).*(timeout|disconnect)"
+    reason: "Health probe transport noise."
+
+expected:
+  - id: startup_log_level
+    severity: [INFO]
+    template_contains: "LogLevel:"
+    reason: "Standard service startup logging."
+  - id: apscheduler_noise
+    severity: [WARNING]
+    template_regex: "apscheduler|scheduler"
+    reason: "Scheduler warning catalog entry. Review before promoting to known-noise."
+
+unexpected:
+  new_error_severities: [ERROR, CRITICAL, FATAL]
+  frequency_increase_ratio: 2.0
+  min_count: 5

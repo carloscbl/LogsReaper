@@ -1,0 +1,6 @@
+2026-05-14T09:05:00Z	INFO MainThread MainProcess	main.py:12	start	LogLevel: INFO
+2026-05-14T09:05:01Z	ERROR MainThread MainProcess	accounts.py:44	load	Unhandled account failure for user 123e4567-e89b-12d3-a456-426614174000
+Traceback (most recent call last):
+  File "/srv/app/accounts.py", line 44, in load
+ValueError: bad account 507f1f77bcf86cd799439011
+{malformed-json

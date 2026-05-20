@@ -1,0 +1,135 @@
+{
+  "engines": {
+    "drain3": {
+      "elapsed_seconds_mean": 3.2742770339997755,
+      "elapsed_seconds_stdev": 0.026672943390318296,
+      "event_count_mean": 686320,
+      "events_per_second_mean": 209618.86099282416,
+      "events_per_second_stdev": 1699.6123453236046,
+      "max_rss_mb_mean": 19.86328125,
+      "max_rss_mb_stdev": 0.3183773480356093,
+      "raw_samples": [
+        {
+          "drain_config": {
+            "drain_depth": 4,
+            "drain_max_children": 100,
+            "drain_sim_th": 0.4,
+            "parametrize_numeric_tokens": true
+          },
+          "elapsed_seconds": 3.2592494929995155,
+          "engine": "drain3",
+          "event_count": 686320,
+          "events_per_second": 210576.08552954742,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 19.73046875,
+          "template_count": 1,
+          "throughput_mb_per_second": 39.27285548627204,
+          "trial_label": "measured-1"
+        },
+        {
+          "drain_config": {
+            "drain_depth": 4,
+            "drain_max_children": 100,
+            "drain_sim_th": 0.4,
+            "parametrize_numeric_tokens": true
+          },
+          "elapsed_seconds": 3.2585082859995964,
+          "engine": "drain3",
+          "event_count": 686320,
+          "events_per_second": 210623.9848917435,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 19.6328125,
+          "template_count": 1,
+          "throughput_mb_per_second": 39.28178881184261,
+          "trial_label": "measured-2"
+        },
+        {
+          "drain_config": {
+            "drain_depth": 4,
+            "drain_max_children": 100,
+            "drain_sim_th": 0.4,
+            "parametrize_numeric_tokens": true
+          },
+          "elapsed_seconds": 3.305073323000215,
+          "engine": "drain3",
+          "event_count": 686320,
+          "events_per_second": 207656.51255718156,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 20.2265625,
+          "template_count": 1,
+          "throughput_mb_per_second": 38.728349365660065,
+          "trial_label": "measured-3"
+        }
+      ],
+      "template_count_mean": 1,
+      "throughput_mb_per_second_mean": 39.09433122125824,
+      "throughput_mb_per_second_stdev": 0.3169810562900398,
+      "trials": 3
+    },
+    "logsreaper": {
+      "elapsed_seconds_mean": 0.49249394333340507,
+      "elapsed_seconds_stdev": 0.014899328293987454,
+      "event_count_mean": 686320,
+      "events_per_second_mean": 1394420.7236190084,
+      "events_per_second_stdev": 42666.249769566995,
+      "max_rss_mb_mean": 1340.6848958333333,
+      "max_rss_mb_stdev": 1.9716555836554963,
+      "raw_samples": [
+        {
+          "elapsed_seconds": 0.49636936299975787,
+          "engine": "logsreaper",
+          "event_count": 686320,
+          "events_per_second": 1382680.0184690987,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 1339.7578125,
+          "template_count": 2,
+          "throughput_mb_per_second": 257.87255192125514,
+          "trial_label": "measured-1"
+        },
+        {
+          "elapsed_seconds": 0.5050726320005197,
+          "engine": "logsreaper",
+          "event_count": 686320,
+          "events_per_second": 1358854.0667538957,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 1342.94921875,
+          "template_count": 2,
+          "throughput_mb_per_second": 253.4289649100284,
+          "trial_label": "measured-2"
+        },
+        {
+          "elapsed_seconds": 0.47603983499993774,
+          "engine": "logsreaper",
+          "event_count": 686320,
+          "events_per_second": 1441728.0856340306,
+          "input_bytes": 134217764,
+          "input_path": "/tmp/logs-reaper-128mb.ndjson",
+          "max_rss_mb": 1339.34765625,
+          "template_count": 2,
+          "throughput_mb_per_second": 268.8851329685301,
+          "trial_label": "measured-3"
+        }
+      ],
+      "template_count_mean": 2,
+      "throughput_mb_per_second_mean": 260.06221659993787,
+      "throughput_mb_per_second_stdev": 7.957339776392938,
+      "trials": 3
+    }
+  },
+  "run": {
+    "created_at": "2026-05-20T08:38:17.045949+00:00",
+    "input_bytes": 134217764,
+    "input_path": "/tmp/logs-reaper-128mb.ndjson",
+    "machine": "Linux-6.17.0-29-generic-x86_64-with-glibc2.39",
+    "message_key": "message",
+    "python_drain3": "/tmp/logsreaper-bench-venv/bin/python",
+    "python_logsreaper": "/usr/bin/python3",
+    "trials": 3,
+    "warmup": 1
+  }
+}

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "logs-reaper-core"
+description = "LogsReaper Rust core compiled as a Python extension module (pyo3)."
+requires-python = ">=3.10"
+version = "0.2.0"
+license = { text = "Proprietary" }
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[tool.maturin]
+features = ["python"]
+module-name = "logs_reaper_core"
+bindings = "pyo3"
+strip = true

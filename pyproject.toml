@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "logs-reaper"
+version = "0.1.0"
+description = "Standalone log parser, template miner, classifier, and run comparator."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pyarrow>=15",
+  "PyYAML>=6",
+  "pydantic>=2",
+]
+
+[project.optional-dependencies]
+fast = ["blake3>=1.0", "maturin>=1.7"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+logs-reaper = "logs_reaper.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.hatch.build.targets.wheel]
+packages = ["logs_reaper"]

@@ -1,0 +1,15 @@
+out/
+runs/
+baselines/*/baseline.parquet
+baselines/*/template_registry.parquet
+.gwkit-diff/
+.pytest_cache/
+__pycache__/
+*.pyc
+rust/logs_reaper_core/target/
+.venv/
+venv/
+.mypy_cache/
+.coverage
+htmlcov/
+node_modules/
